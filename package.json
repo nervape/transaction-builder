@@ -2,7 +2,9 @@
   "name": "transaction-builder",
   "version": "1.0.0",
   "scripts": {
-    "server": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "server": "node dist/index.js",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -10,7 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@ckb-lumos/lumos": "^0.22.0-next.5",
+    "@ckb-lumos/lumos": "0.22.0-next.5",
     "@exact-realty/multipart-parser": "^1.0.14",
     "@koa/bodyparser": "^5.1.1",
     "@koa/router": "^12.0.1",
@@ -18,18 +20,24 @@
     "@rgbpp-sdk/btc": "^0.5.0",
     "@rgbpp-sdk/ckb": "^0.5.0",
     "@spore-sdk/core": "^0.2.1",
+    "@types/koa-router": "^7.4.8",
     "dotenv": "^16.4.5",
     "js-sha256": "^0.11.0",
-    "spore-sdk": "github:sporeprotocol/spore-sdk",
+    "koa": "^2.15.3",
+    "koa-router": "^12.0.1",
+    "lodash": "^4.17.21",
     "undici": "^6.19.5"
   },
   "devDependencies": {
+    "@types/co-body": "^6.1.3",
+    "@types/elliptic": "^6.4.18",
     "@types/koa": "^2.15.0",
-    "@types/koa-router": "^7.4.8",
-    "koa": "^2.15.3",
-    "koa-router": "^12.0.1",
+    "@types/node": "^22.4.0",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
+  },
+  "resolutions": {
+    "@nervosnetwork/ckb-types": "^0.109.3"
   }
 }

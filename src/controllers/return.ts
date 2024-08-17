@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import { CKBRPC, ParamsFormatter } from '@ckb-lumos/lumos/rpc';
+import { CKBRPC } from '@ckb-lumos/lumos/rpc';
 import { wallet, rpcConfig, lumosConfig } from '../services/serviceConfig';
 import { parseAddress } from '@ckb-lumos/lumos/helpers';
 import { transferMultipleSpore } from '@spore-sdk/core';

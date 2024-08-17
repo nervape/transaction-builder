@@ -1,6 +1,4 @@
-import { BI, parseUnit } from '@ckb-lumos/bi';
-import { getClusterBgData } from '../config';
-import { buildSporesData, getRandomElement } from '../helpers';
+import { buildSporesData } from '../helpers';
 import { meltMultipleThenCreateSpore, createSpore, SporeConfig, returnExceededCapacityAndPayFee } from '@spore-sdk/core';
 import { formatUnit } from '@ckb-lumos/lumos/utils';
 

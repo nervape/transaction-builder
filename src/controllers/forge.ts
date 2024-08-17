@@ -1,5 +1,4 @@
 import { Context } from 'koa';
-import { ParamsFormatter } from '@ckb-lumos/lumos/rpc';
 import { wallet, rpcConfig } from '../services/serviceConfig';
 import { handleSporeTransaction } from '../services/sporeService';
 

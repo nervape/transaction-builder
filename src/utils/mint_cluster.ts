@@ -1,6 +1,6 @@
 import fs from "fs"
 import path from 'path';
-import { bytesToHex, AddressPrefix, addressToScript, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
+import { bytesToHex, getTransactionSize, privateKeyToAddress } from '@nervosnetwork/ckb-sdk-utils';
 import { packRawClusterData } from '@spore-sdk/core';
 import {
   Collector,

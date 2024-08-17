@@ -14,7 +14,7 @@ export const rpcConfig = isMainnet ? predefinedSporeConfigs.Mainnet : predefined
 export const lumosConfig = isMainnet ? predefined.LINA : predefined.AGGRON4;
 
 rpcConfig.ckbIndexerUrl = process.env.CKB_INDEXER_URL!;
-rpcConfig.ckbNodeUrl = process.env.CKB_URL!;
+rpcConfig.ckbNodeUrl = process.env.CKB_NODE_URL!;
 
 export const wallet = createDefaultLockWallet(private_key);
 console.log("Using private key from address: ", wallet.address);
