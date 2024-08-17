@@ -1,0 +1,35 @@
+{
+  "name": "transaction-builder",
+  "version": "1.0.0",
+  "scripts": {
+    "server": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@ckb-lumos/lumos": "^0.22.0-next.5",
+    "@exact-realty/multipart-parser": "^1.0.14",
+    "@koa/bodyparser": "^5.1.1",
+    "@koa/router": "^12.0.1",
+    "@nervosnetwork/ckb-sdk-utils": "^0.109.3",
+    "@rgbpp-sdk/btc": "^0.5.0",
+    "@rgbpp-sdk/ckb": "^0.5.0",
+    "@spore-sdk/core": "^0.2.1",
+    "dotenv": "^16.4.5",
+    "js-sha256": "^0.11.0",
+    "spore-sdk": "github:sporeprotocol/spore-sdk",
+    "undici": "^6.19.5"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.15.0",
+    "@types/koa-router": "^7.4.8",
+    "koa": "^2.15.3",
+    "koa-router": "^12.0.1",
+    "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}
