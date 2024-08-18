@@ -5,6 +5,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { addressToScript, hexToBytes } from '@nervosnetwork/ckb-sdk-utils';
 import { sha256 } from 'js-sha256';
+import { rpcConfig } from './services/serviceConfig';
 
 export interface Wallet {
   lock: Script;
@@ -20,7 +21,7 @@ export interface Wallet {
  * providing lock/address, and functions to sign message/transaction and send the transaction on-chain.
  */
 export function createDefaultLockWallet(privateKey: HexString): Wallet {
-  const config = getSporeConfig();
+  const config = rpcConfig;
 
   // Generate a lock script from the private key
   const defaultLock = config.lumos.SCRIPTS.SECP256K1_BLAKE160!;
