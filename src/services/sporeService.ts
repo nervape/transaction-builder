@@ -1,5 +1,5 @@
 import { buildSporesData } from '../helpers';
-import { meltMultipleThenCreateSpore, createSpore, SporeConfig, returnExceededCapacityAndPayFee } from '@spore-sdk/core';
+import { meltMultipleThenCreateSpore, createSpore, SporeConfig, returnExceededCapacityAndPayFee, calculateNeededCapacity, injectNeededCapacity } from '@spore-sdk/core';
 import { formatUnit, parseUnit } from '@ckb-lumos/lumos/utils';
 
 export async function handleSporeTransaction(materials: any[], senderAddress: string, cluster_id: string, reward: {
@@ -46,15 +46,36 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
             fromInfos: [wallet.address],
             config: rpcConfig,
             prefixOutputs: prefixOutputs,
-            capacityMargin: parseUnit(`${capacity_ckb - 363}`, 'ckb')
+            updateOutput: (cell) => {
+                cell.cellOutput.capacity = parseUnit(`${capacity_ckb}`, "ckb").toHexString();
+                return cell;
+            }
         }));
-        const injectResult = await returnExceededCapacityAndPayFee({
-            txSkeleton,
+
+        let needed = await calculateNeededCapacity({
+            txSkeleton: txSkeleton,
             changeAddress: wallet.address,
-            config: rpcConfig,
-            //feeRate: parseUnit("1000", "shannon")
-        });
-        txSkeleton = injectResult.txSkeleton;
+            config: rpcConfig.lumos,
+          });
+
+        if (needed.neededCapacity.gt(parseUnit(`${0}`, "shannon"))) {
+            const injectResult = await injectNeededCapacity({
+                txSkeleton,
+                fromInfos: [wallet.address],
+                config: rpcConfig.lumos,
+              });
+            txSkeleton = injectResult.txSkeleton;
+            needed.exceedCapacity = injectResult.after!.inputsRemainCapacity;
+        }
+
+        if (needed.exceedCapacity.gt(parseUnit(`${0}`, "shannon"))) {
+            const injectResult = await returnExceededCapacityAndPayFee({
+                txSkeleton,
+                changeAddress: wallet.address,
+                config: rpcConfig,
+            });
+            txSkeleton = injectResult.txSkeleton;
+        }
     } else {
         ({ txSkeleton } = await createSpore({
             data: spore_data[0].data,
