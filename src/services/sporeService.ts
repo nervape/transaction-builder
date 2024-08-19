@@ -9,7 +9,7 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
         bg: string,
         view: number,
     }
-}, refund_ckb: number, wallet: any, rpcConfig: SporeConfig) {
+}, capacity_ckb: number, refund_ckb: number, wallet: any, rpcConfig: SporeConfig) {
     const outPoints = materials.filter((m) => m.type === 'Spore').map((m) => ({
         txHash: `${m.tx_hash}`,
         index: m.index,
@@ -33,8 +33,9 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
     };
 
     let txSkeleton;
+    let outputIndex: number;
     if (outPoints.length > 0) {
-        ({ txSkeleton } = await meltMultipleThenCreateSpore({
+        ({ txSkeleton, outputIndex } = await meltMultipleThenCreateSpore({
             outPoints,
             data: spore_data[0].data,
             toLock: spore_data[0].toLock,
@@ -42,6 +43,14 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
             config: rpcConfig,
             postOutputs: [postOutput],
         }));
+
+        // setting spore capacity
+        let outputs = txSkeleton.get("outputs");
+        let spore_cell = outputs.get(outputIndex)!;
+        spore_cell.cellOutput.capacity = formatUnit(capacity_ckb, "ckb");
+        outputs = outputs.update(outputIndex, cell => spore_cell);
+        txSkeleton = txSkeleton.update("outputs", (outputs) => outputs);
+        
         const injectResult = await returnExceededCapacityAndPayFee({
             txSkeleton,
             changeAddress: wallet.address,

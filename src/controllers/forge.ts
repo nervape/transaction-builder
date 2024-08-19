@@ -6,8 +6,9 @@ export async function forgeHandler(ctx: Context) {
     console.log(ctx.request.body);
     const { sender, materials, cluster_id, reward } = ctx.request.body;
     try {
+        const capacity_ckb = 450;
         const refund_ckb = 100;
-        const txSkeleton = await handleSporeTransaction(materials, sender, cluster_id, reward, refund_ckb, wallet, rpcConfig);
+        const txSkeleton = await handleSporeTransaction(materials, sender, cluster_id, reward, capacity_ckb, refund_ckb, wallet, rpcConfig);
 
         //const signed = await wallet.signRawTransaction(txSkeleton);
         //const jsonResult = JSON.stringify(ParamsFormatter.toRawTransaction(signed));
