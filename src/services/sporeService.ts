@@ -1,6 +1,6 @@
 import { buildSporesData } from '../helpers';
 import { meltMultipleThenCreateSpore, createSpore, SporeConfig, returnExceededCapacityAndPayFee } from '@spore-sdk/core';
-import { formatUnit } from '@ckb-lumos/lumos/utils';
+import { formatUnit, parseUnit } from '@ckb-lumos/lumos/utils';
 
 export async function handleSporeTransaction(materials: any[], senderAddress: string, cluster_id: string, reward: {
     id: string,
@@ -22,11 +22,12 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
     }], cluster_id);
 
     console.log(outPoints, spore_data);
+    console.log(`capacity: ${parseUnit(`${refund_ckb}`, "ckb").toHexString()}`)
 
     // the refund cell
     const postOutput = {
         cellOutput: {
-            capacity: formatUnit(refund_ckb, "ckb"),
+            capacity: parseUnit(`${refund_ckb}`, "ckb").toHexString(),
             lock: spore_data[0].toLock,
         },
         data: "0x",
@@ -47,8 +48,8 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
         // setting spore capacity
         let outputs = txSkeleton.get("outputs");
         let spore_cell = outputs.get(outputIndex)!;
-        spore_cell.cellOutput.capacity = formatUnit(capacity_ckb, "ckb");
-        outputs = outputs.update(outputIndex, cell => spore_cell);
+        spore_cell.cellOutput.capacity = parseUnit(`${capacity_ckb}`, "ckb").toHexString();
+        outputs = outputs.update(outputIndex, _ => spore_cell);
         txSkeleton = txSkeleton.update("outputs", (outputs) => outputs);
         
         const injectResult = await returnExceededCapacityAndPayFee({
