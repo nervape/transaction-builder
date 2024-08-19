@@ -22,13 +22,13 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
     }], cluster_id);
 
     console.log(outPoints, spore_data);
-    console.log(`capacity: ${parseUnit(`${refund_ckb}`, "ckb").toHexString()}`)
+    console.log(`refund: ${parseUnit(`${refund_ckb}`, "ckb").toHexString()}, capacity: ${capacity_ckb}, capacity_margin: ${capacity_ckb - 363}`)
 
-    let postOutputs;
+    let prefixOutputs;
 
     if(refund_ckb > 0) {
         // the refund cell
-        postOutputs = [{
+        prefixOutputs = [{
             cellOutput: {
                 capacity: parseUnit(`${refund_ckb}`, "ckb").toHexString(),
                 lock: spore_data[0].toLock,
@@ -38,24 +38,16 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
     }
 
     let txSkeleton;
-    let outputIndex: number;
     if (outPoints.length > 0) {
-        ({ txSkeleton, outputIndex } = await meltMultipleThenCreateSpore({
+        ({ txSkeleton } = await meltMultipleThenCreateSpore({
             outPoints,
             data: spore_data[0].data,
             toLock: spore_data[0].toLock,
             fromInfos: [wallet.address],
             config: rpcConfig,
-            postOutputs: postOutputs,
+            prefixOutputs: prefixOutputs,
+            capacityMargin: parseUnit(`${capacity_ckb - 363}`, 'ckb')
         }));
-
-        // setting spore capacity
-        let outputs = txSkeleton.get("outputs");
-        let spore_cell = outputs.get(outputIndex)!;
-        spore_cell.cellOutput.capacity = parseUnit(`${capacity_ckb}`, "ckb").toHexString();
-        outputs = outputs.update(outputIndex, _ => spore_cell);
-        txSkeleton = txSkeleton.update("outputs", (outputs) => outputs);
-        
         const injectResult = await returnExceededCapacityAndPayFee({
             txSkeleton,
             changeAddress: wallet.address,
@@ -74,6 +66,7 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
         const injectResult = await returnExceededCapacityAndPayFee({
             txSkeleton,
             changeAddress: wallet.address,
+            fromInfos: [wallet.address],
             config: rpcConfig,
             //feeRate: parseUnit("1000", "shannon")
         });
