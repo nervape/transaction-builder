@@ -24,14 +24,18 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
     console.log(outPoints, spore_data);
     console.log(`capacity: ${parseUnit(`${refund_ckb}`, "ckb").toHexString()}`)
 
-    // the refund cell
-    const postOutput = {
-        cellOutput: {
-            capacity: parseUnit(`${refund_ckb}`, "ckb").toHexString(),
-            lock: spore_data[0].toLock,
-        },
-        data: "0x",
-    };
+    let postOutputs;
+
+    if(refund_ckb > 0) {
+        // the refund cell
+        postOutputs = [{
+            cellOutput: {
+                capacity: parseUnit(`${refund_ckb}`, "ckb").toHexString(),
+                lock: spore_data[0].toLock,
+            },
+            data: "0x",
+        }];
+    }
 
     let txSkeleton;
     let outputIndex: number;
@@ -42,7 +46,7 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
             toLock: spore_data[0].toLock,
             fromInfos: [wallet.address],
             config: rpcConfig,
-            postOutputs: [postOutput],
+            postOutputs: postOutputs,
         }));
 
         // setting spore capacity
