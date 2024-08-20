@@ -2,7 +2,7 @@ import { buildSporesData } from '../helpers';
 import { meltMultipleThenCreateSpore, createSpore, SporeConfig, returnExceededCapacityAndPayFee, calculateNeededCapacity, injectNeededCapacity } from '@spore-sdk/core';
 import { formatUnit, parseUnit } from '@ckb-lumos/lumos/utils';
 
-export async function handleSporeTransaction(materials: any[], senderAddress: string, cluster_id: string, reward: {
+export async function handleSporeTransaction(materials: any[], senderAddress: string, cluster_id: string, gear_id: string, reward: {
     id: string,
     name: string,
     btcfs: {
@@ -19,13 +19,11 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
         address: senderAddress,
         bg: reward.btcfs.bg,
         view: reward.btcfs.view
-    }], cluster_id);
+    }], cluster_id, gear_id);
 
     console.log(outPoints, spore_data);
-    console.log(`refund: ${parseUnit(`${refund_ckb}`, "ckb").toHexString()}, capacity: ${capacity_ckb}, capacity_margin: ${capacity_ckb - 363}`)
 
     let prefixOutputs;
-
     if(refund_ckb > 0) {
         // the refund cell
         prefixOutputs = [{

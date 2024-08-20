@@ -4,9 +4,9 @@ import { handleSporeTransaction } from '../services/sporeService';
 
 export async function forgeHandler(ctx: Context) {
     console.log(ctx.request.body);
-    const { sender, materials, cluster_id, reward, capacity, refund } = ctx.request.body;
+    const { sender, materials, cluster_id, reward, capacity, refund, gear_id } = ctx.request.body;
     try {
-        const txSkeleton = await handleSporeTransaction(materials, sender, cluster_id, reward, capacity, refund, wallet, rpcConfig);
+        const txSkeleton = await handleSporeTransaction(materials, sender, cluster_id, gear_id, reward, capacity, refund, wallet, rpcConfig);
 
         //const signed = await wallet.signRawTransaction(txSkeleton);
         //const jsonResult = JSON.stringify(ParamsFormatter.toRawTransaction(signed));

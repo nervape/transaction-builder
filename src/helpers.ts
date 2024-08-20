@@ -130,12 +130,18 @@ function generateGearId(clusterId: string, receiverAddress: string, tokenId: num
 
 export function buildSporesData(
   mintList: { address: string, bg: string, view: number }[],
-  clusterId: string
+  clusterId: string,
+  extraId?: string,
 ) {
   return mintList.map(({ address, bg, view }, index: number) => {
     const viewIndex = hexToBytes(view)
     const gearId = generateGearId(clusterId, address, index + 1)
-    const content = Buffer.concat([textEncocder.encode(bg), viewIndex, hexToBytes(`0x${gearId}`)]).toString('hex')
+    let content;
+    if(extraId) {
+      content = Buffer.concat([textEncocder.encode(bg), viewIndex, hexToBytes(`0x${gearId}`), hexToBytes(`0x${extraId}`)]).toString('hex')
+    } else {
+      content = Buffer.concat([textEncocder.encode(bg), viewIndex, hexToBytes(`0x${gearId}`)]).toString('hex')
+    }
     return {
       toLock: addressToScript(address),
       data: {
