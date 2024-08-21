@@ -24,7 +24,6 @@ export async function returnHandler(ctx: Context) {
             capacity: m.amount as number,
         }));
 
-    let neededCapacity = ckbOutPoints.reduce((acc: number, mat: {capacity: number}) => acc + mat.capacity, 0);
 
     const senderScript = parseAddress(sender, { config: lumosConfig });
 
