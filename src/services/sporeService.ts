@@ -1,15 +1,15 @@
 import { buildSporesData } from '../helpers';
-import { meltMultipleThenCreateSpore, createSpore, SporeConfig, returnExceededCapacityAndPayFee } from '@spore-sdk/core';
-import { formatUnit } from '@ckb-lumos/lumos/utils';
+import { meltMultipleThenCreateSpore, createSpore, SporeConfig, returnExceededCapacityAndPayFee, calculateNeededCapacity, injectNeededCapacity } from '@spore-sdk/core';
+import { formatUnit, parseUnit } from '@ckb-lumos/lumos/utils';
 
-export async function handleSporeTransaction(materials: any[], senderAddress: string, cluster_id: string, reward: {
+export async function handleSporeTransaction(materials: any[], senderAddress: string, cluster_id: string, gear_id: string, reward: {
     id: string,
     name: string,
     btcfs: {
         bg: string,
         view: number,
     }
-}, refund_ckb: number, wallet: any, rpcConfig: SporeConfig) {
+}, capacity_ckb: number, refund_ckb: number, wallet: any, rpcConfig: SporeConfig) {
     const outPoints = materials.filter((m) => m.type === 'Spore').map((m) => ({
         txHash: `${m.tx_hash}`,
         index: m.index,
@@ -19,18 +19,21 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
         address: senderAddress,
         bg: reward.btcfs.bg,
         view: reward.btcfs.view
-    }], cluster_id);
+    }], cluster_id, gear_id);
 
     console.log(outPoints, spore_data);
 
-    // the refund cell
-    const postOutput = {
-        cellOutput: {
-            capacity: formatUnit(refund_ckb, "ckb"),
-            lock: spore_data[0].toLock,
-        },
-        data: "0x",
-    };
+    let prefixOutputs;
+    if(refund_ckb > 0) {
+        // the refund cell
+        prefixOutputs = [{
+            cellOutput: {
+                capacity: parseUnit(`${refund_ckb}`, "ckb").toHexString(),
+                lock: spore_data[0].toLock,
+            },
+            data: "0x",
+        }];
+    }
 
     let txSkeleton;
     if (outPoints.length > 0) {
@@ -40,15 +43,37 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
             toLock: spore_data[0].toLock,
             fromInfos: [wallet.address],
             config: rpcConfig,
-            postOutputs: [postOutput],
+            prefixOutputs: prefixOutputs,
+            updateOutput: (cell) => {
+                cell.cellOutput.capacity = parseUnit(`${capacity_ckb}`, "ckb").toHexString();
+                return cell;
+            }
         }));
-        const injectResult = await returnExceededCapacityAndPayFee({
-            txSkeleton,
+
+        let needed = await calculateNeededCapacity({
+            txSkeleton: txSkeleton,
             changeAddress: wallet.address,
-            config: rpcConfig,
-            //feeRate: parseUnit("1000", "shannon")
-        });
-        txSkeleton = injectResult.txSkeleton;
+            config: rpcConfig.lumos,
+          });
+
+          console.log("needed: ", needed)
+
+        if (needed.neededCapacity.gt(parseUnit(`${0}`, "shannon"))) {
+            const injectResult = await injectNeededCapacity({
+                txSkeleton,
+                fromInfos: [wallet.address],
+                config: rpcConfig.lumos,
+              });
+            txSkeleton = injectResult.txSkeleton;
+            needed.exceedCapacity = injectResult.after!.inputsRemainCapacity;
+        }else if (needed.exceedCapacity.gt(parseUnit(`${0}`, "shannon"))) {
+            const injectResult = await returnExceededCapacityAndPayFee({
+                txSkeleton,
+                changeAddress: wallet.address,
+                config: rpcConfig,
+            });
+            txSkeleton = injectResult.txSkeleton;
+        }
     } else {
         ({ txSkeleton } = await createSpore({
             data: spore_data[0].data,
@@ -60,6 +85,7 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
         const injectResult = await returnExceededCapacityAndPayFee({
             txSkeleton,
             changeAddress: wallet.address,
+            fromInfos: [wallet.address],
             config: rpcConfig,
             //feeRate: parseUnit("1000", "shannon")
         });
