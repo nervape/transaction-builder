@@ -12,14 +12,14 @@ export async function returnHandler(ctx: Context) {
     const outPoints = materials
         .filter((m: Material) => m.type === 'Spore')
         .map((m: Material) => ({
-            txHash: `0x${m.tx_hash}`,
+            txHash: m.tx_hash,
             index: m.index,
         }));
 
     const ckbOutPoints = materials
         .filter((m: Material) => m.type === 'Ckb')
         .map((m: Material) => ({
-            txHash: `0x${m.tx_hash}`,
+            txHash: m.tx_hash,
             index: m.index,
             capacity: m.amount as number,
         }));

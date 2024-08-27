@@ -56,6 +56,8 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
             config: rpcConfig.lumos,
           });
 
+          console.log("needed: ", needed)
+
         if (needed.neededCapacity.gt(parseUnit(`${0}`, "shannon"))) {
             const injectResult = await injectNeededCapacity({
                 txSkeleton,
@@ -64,9 +66,7 @@ export async function handleSporeTransaction(materials: any[], senderAddress: st
               });
             txSkeleton = injectResult.txSkeleton;
             needed.exceedCapacity = injectResult.after!.inputsRemainCapacity;
-        }
-
-        if (needed.exceedCapacity.gt(parseUnit(`${0}`, "shannon"))) {
+        }else if (needed.exceedCapacity.gt(parseUnit(`${0}`, "shannon"))) {
             const injectResult = await returnExceededCapacityAndPayFee({
                 txSkeleton,
                 changeAddress: wallet.address,
