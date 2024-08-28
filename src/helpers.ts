@@ -125,7 +125,7 @@ function generateGearId(clusterId: string, receiverAddress: string, tokenId: num
   hash.update(hexToBytes(clusterId));
   hash.update(hexToBytes('0x' + tokenId.toString(16)));
   hash.update(receiverAddress);
-  return hash.hex().slice(0, 16);
+  return hash.hex().slice(0, 11);
 }
 
 export function buildSporesData(
@@ -136,9 +136,10 @@ export function buildSporesData(
   return mintList.map(({ address, bg, view }, index: number) => {
     const viewIndex = hexToBytes(view)
     const gearId = generateGearId(clusterId, address, index + 1)
+    const forge_string = 'forge';
     let content;
     if(extraId) {
-      content = Buffer.concat([textEncocder.encode(bg), viewIndex, hexToBytes(`0x${gearId}`), hexToBytes(`0x${extraId}`)]).toString('hex')
+      content = Buffer.concat([textEncocder.encode(bg), viewIndex, hexToBytes(`0x${gearId}`), textEncocder.encode(forge_string), hexToBytes(`0x${extraId}`)]).toString('hex')
     } else {
       content = Buffer.concat([textEncocder.encode(bg), viewIndex, hexToBytes(`0x${gearId}`)]).toString('hex')
     }
